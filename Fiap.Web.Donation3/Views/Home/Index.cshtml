@@ -1,8 +1,36 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+@model IList<ProdutoModel>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h1>Produtos Disponiveis</h1>
+
+<table class="table table-striped" border="1" cellspacing="0" cellpadding="0">
+    <thead>
+        <tr>
+            <th data-field="id">Id</th>
+            <th data-field="name">Nome</th>
+            <th data-field="tipo">Categoria</th>
+            <th data-field="disponivel">Disponível</th>
+            <th data-field="dataexpiracao">Expiração</th>
+            <th class="actions" width="220">Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td data-field="id">@item.ProdutoId</td>
+                <td data-field="name">@item.Nome</td>
+                <td data-field="Categoria">@item.CategoriaId</td>
+                <td data-field="disponivel">@item.Disponivel</td>
+                <td data-field="dataExpiracao">@item.DataExpiracao</td>
+                <td class="actions" width="220">
+                    <a href="#" class="create btn btn-dark">Detalhe</a>
+                    <a asp-controller="Produto" asp-action="Editar" asp-route-id="@item.ProdutoId" class="create btn btn-primary">Editar</a>
+                    <a asp-controller="Produto" asp-action="Delete" asp-route-id="@item.ProdutoId" class="create btn btn-danger">Excluir</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

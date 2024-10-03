@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Fiap.Web.Donation3.Models
@@ -8,6 +9,7 @@ namespace Fiap.Web.Donation3.Models
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [HiddenInput]
         public int ProdutoId { get; set; }
 
         [Required(ErrorMessage ="O campo nome é obrigatorio")]
@@ -29,7 +31,7 @@ namespace Fiap.Web.Donation3.Models
 
         public DateTime DataCadastro { get; set; } = DateTime.Now;
 
-        public DateTime DataExpiracao { get; set; }
+        public DateTime DataExpiracao { get; set; } = DateTime.Today.AddDays(5);
 
 
         // Usuario dono do produto

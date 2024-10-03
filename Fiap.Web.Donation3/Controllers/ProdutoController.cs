@@ -1,5 +1,6 @@
 ﻿using Fiap.Web.Donation3.Data;
 using Fiap.Web.Donation3.Models;
+using Fiap.Web.Donation3.Repository;
 using Microsoft.AspNetCore.Mvc;
 using System.Reflection.Metadata.Ecma335;
 
@@ -7,11 +8,17 @@ namespace Fiap.Web.Donation3.Controllers
 {
     public class ProdutoController : Controller
     {
-        private readonly DataContext _dataContext;
+        //Gambiarra do Flavio
+
+        private readonly int UserId = 1;
+
+        private readonly ProdutoRepository _produtoRepository;
+        private readonly CategoriaRepository _categoriaRepository;
 
         public ProdutoController(DataContext dataContext)
         {
-            _dataContext = dataContext;
+            _produtoRepository = new ProdutoRepository(dataContext);
+            _categoriaRepository = new CategoriaRepository(dataContext);  
         }
 
 
@@ -20,7 +27,7 @@ namespace Fiap.Web.Donation3.Controllers
         public IActionResult Index()
         {   
             //SELECT * FROM Produto
-            var listaProdutos = _dataContext.Produtos.ToList();
+            var listaProdutos = _produtoRepository.FindAll();
 
             //Exibir a View de Listagem de Produtos
             return View(listaProdutos);
@@ -29,6 +36,7 @@ namespace Fiap.Web.Donation3.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            ViewBag.Categorias = _categoriaRepository.FindAll();
             return View(new ProdutoModel());
         }
 
@@ -37,11 +45,14 @@ namespace Fiap.Web.Donation3.Controllers
         {
             if(ModelState.IsValid)
             {
+                produtoModel.UsuarioId = UserId;
+                _produtoRepository.Insert(produtoModel);
                 TempData["MensagemSucesso"] = $"Produto {produtoModel.Nome} cadastrado com sucesso";
                 return RedirectToAction(nameof(Index));
             }
             else
             {
+                ViewBag.Categias = _categoriaRepository.FindAll();
                 return View(produtoModel);
             }
 
@@ -50,18 +61,9 @@ namespace Fiap.Web.Donation3.Controllers
         [HttpGet]
         public IActionResult Editar(int id)
         {
-            //SELECT * FROM TB_PROD WHERE ProdutoId = {id}
-
-            var produto = ListarProdutosMock().Where(p => p.ProdutoId == id).FirstOrDefault();
+            ViewBag.Categorias = _categoriaRepository.FindAll();
+            var produto = _produtoRepository.FindById(id);
             return View(produto);
-        }
-
-        //fazer o cadastro do produto
-        [HttpGet]
-        public IActionResult Novo()
-        {
-
-            return View();
         }
 
         [HttpPost]
@@ -69,33 +71,33 @@ namespace Fiap.Web.Donation3.Controllers
         {
             //UPDATE Produto SET .... WHERE ProdutoId = {produtoModel.id}
 
-            var sucesso = true;
-            var mensagemErro = "";
-
-            if (string.IsNullOrEmpty(produtoModel.Nome))
+            if (ModelState.IsValid)
             {
-                mensagemErro += "O campo é obrigatório";
-               sucesso = false;
-            }
+                produtoModel.UsuarioId = UserId;
+                _produtoRepository.Update(produtoModel);
 
-            if (string.IsNullOrEmpty(produtoModel.Descricao))
-            {
-                mensagemErro += "Descrição é obrigatório";
-                sucesso = false;
-            }
-
-            if (!sucesso)
-            {
-                ViewBag.MensagemErro =mensagemErro;
-                return View(produtoModel);
+                TempData["MensagemSucesso"] = $"Produto {produtoModel.Nome} alterado com sucesso";
+                return RedirectToAction(nameof(Index));
             }
             else
             {
-                TempData["mensagemErro"] = $"Produto {produtoModel.Nome} alterado com sucesso";
-                return RedirectToAction(nameof(Index));             
+                ViewBag.Categorias = _categoriaRepository.FindAll();
+                ViewBag.MensagemErro = "Preencha todos os dados corretamente";
+                return View(produtoModel);
             }
 
         }
+
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            var produto = _produtoRepository.FindById(id);
+            _produtoRepository.Delete(produto.ProdutoId);
+
+            TempData["MensagemSucesso"] = $"Produto {produto.Nome} excluido com sucesso";
+            return RedirectToAction(nameof(Index));
+        }
+ 
 
         private List<ProdutoModel> ListarProdutosMock()
         {

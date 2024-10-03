@@ -1,4 +1,6 @@
+using Fiap.Web.Donation3.Data;
 using Fiap.Web.Donation3.Models;
+using Fiap.Web.Donation3.Repository;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -8,14 +10,21 @@ namespace Fiap.Web.Donation3.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        private readonly ProdutoRepository _produtoRepository;
+        private readonly CategoriaRepository _categoriaRepository;
+
+        public HomeController(ILogger<HomeController> logger, DataContext dataContext)
         {
             _logger = logger;
+            _produtoRepository = new ProdutoRepository(dataContext);
+            _categoriaRepository = new CategoriaRepository(dataContext);
         }
 
         public IActionResult Index()
         {
-            return View();
+            var listaProdutos = _produtoRepository.FindAllAvaliable();
+
+            return View(listaProdutos);
         }
 
 

@@ -5,7 +5,7 @@
 
 @if (!string.IsNullOrEmpty(TempData["MensagemSucesso"] as string))
 {
-    <div class="alert alert-danger">@TempData["MensagemSucesso"]</div>
+    <div class="alert alert-success">@TempData["MensagemSucesso"]</div>
 }
 
 <p class="toolbar">
@@ -34,8 +34,8 @@
                 <td data-field="dataExpiracao">@item.DataExpiracao</td>
                 <td class="actions" width="220">
                     <a href="#">Detalhe</a>
-                    <a href="/Produto/Editar/@item.ProdutoId">Editar</a>
-                    <a href="#">Remover</a>
+                    <a asp-controller="Produto" asp-action="Editar" asp-route-id="@item.ProdutoId" class="create btn btn-primary">Editar</a>
+                    <a asp-controller="Produto" asp-action="Delete" asp-route-id="@item.ProdutoId" class="create btn btn-danger">Excluir</a>
                 </td>
             </tr>             
         }
